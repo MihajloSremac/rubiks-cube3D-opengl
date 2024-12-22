@@ -1,0 +1,2 @@
+C:\Users\NTP-325-XXXXX\Desktop\Sablon\x64\Debug\glew32.dll
+C:\Users\NTP-325-XXXXX\Desktop\Sablon\x64\Debug\Sablon.exe

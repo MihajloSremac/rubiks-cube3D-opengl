@@ -1,0 +1,3 @@
+﻿  main.cpp
+C:\Users\NTP-325-XXXXX\Desktop\Sablon\main.cpp(105,39): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
+  Sablon.vcxproj -> C:\Users\NTP-325-XXXXX\Desktop\Sablon\x64\Debug\Sablon.exe
