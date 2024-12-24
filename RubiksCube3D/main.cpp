@@ -1,145 +1,358 @@
-// Autor: Nedeljko Tesanovic
-// Opis: Zestoko iskomentarisan program koji crta sareni trougao u OpenGL-u
 
 #define _CRT_SECURE_NO_WARNINGS
- //Biblioteke za stvari iz C++-a (unos, ispis, fajlovi itd) 
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
-//Biblioteke OpenGL-a
-#include <GL/glew.h>   //Omogucava upotrebu OpenGL naredbi
-#include <GLFW/glfw3.h>//Olaksava pravljenje i otvaranje prozora (konteksta) sa OpenGL sadrzajem
+#include <GL/glew.h>  
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <vector>
+#include <array>
 
-unsigned int compileShader(GLenum type, const char* source); //Uzima kod u fajlu na putanji "source", kompajlira ga i vraca sejder tipa "type"
-unsigned int createShader(const char* vsSource, const char* fsSource); //Pravi objedinjeni sejder program koji se sastoji od Vertex sejdera ciji je kod na putanji vsSource i Fragment sejdera na putanji fsSource
+unsigned int compileShader(GLenum type, const char* source); 
+unsigned int createShader(const char* vsSource, const char* fsSource); 
+
+void initCube();
+void updateCubeState(int face, bool clockwise);
+void updateRotation();
+void drawCube(unsigned int shaderProgram);
+void handleInput(GLFWwindow* window);
+void rotateFace(int face, bool clockwise);
+
+const glm::vec4 RED(1.0f, 0.0f, 0.0f, 1.0f);
+const glm::vec4 GREEN(0.0f, 1.0f, 0.0f, 1.0f);
+const glm::vec4 BLUE(0.0f, 0.0f, 1.0f, 1.0f);
+const glm::vec4 ORANGE(1.0f, 0.5f, 0.0f, 1.0f);
+const glm::vec4 WHITE(1.0f, 1.0f, 1.0f, 1.0f);
+const glm::vec4 YELLOW(1.0f, 1.0f, 0.0f, 1.0f);
+
+struct Cubie {
+    glm::vec3 position;
+    std::array<glm::vec4, 6> colors; 
+};
+
+struct CubeState {
+    std::vector<Cubie> cubies;
+    float rotationX = 0.0f;
+    float rotationY = 0.0f;
+    glm::mat4 model = glm::mat4(1.0f);
+
+    int currentLayer = -1;
+    float layerRotation = 0.0f;
+    bool isRotating = false;
+    float rotationCounter = 0.0f;
+    bool clockwise = true;
+};
+
+CubeState cubeState;
+
+float cubieVertices[] = {
+    // Same vertex data as before...
+    // [Previous vertex data remains unchanged]
+    // Front face (Z+)
+    -0.1f, -0.1f,  0.1f,     1.0f, 0.0f, 0.0f,  // Bottom-left
+     0.1f, -0.1f,  0.1f,     1.0f, 0.0f, 0.0f,  // Bottom-right
+     0.1f,  0.1f,  0.1f,     1.0f, 0.0f, 0.0f,  // Top-right
+     0.1f,  0.1f,  0.1f,     1.0f, 0.0f, 0.0f,  // Top-right
+    -0.1f,  0.1f,  0.1f,     1.0f, 0.0f, 0.0f,  // Top-left
+    -0.1f, -0.1f,  0.1f,     1.0f, 0.0f, 0.0f,  // Bottom-left
+
+    // Back face (Z-)
+    -0.1f, -0.1f, -0.1f,     1.0f, 0.5f, 0.0f,  // Bottom-left
+     0.1f, -0.1f, -0.1f,     1.0f, 0.5f, 0.0f,  // Bottom-right
+     0.1f,  0.1f, -0.1f,     1.0f, 0.5f, 0.0f,  // Top-right
+     0.1f,  0.1f, -0.1f,     1.0f, 0.5f, 0.0f,  // Top-right
+    -0.1f,  0.1f, -0.1f,     1.0f, 0.5f, 0.0f,  // Top-left
+    -0.1f, -0.1f, -0.1f,     1.0f, 0.5f, 0.0f,  // Bottom-left
+
+    // Top face (Y+)
+    -0.1f,  0.1f, -0.1f,     0.0f, 1.0f, 0.0f,  // Back-left
+     0.1f,  0.1f, -0.1f,     0.0f, 1.0f, 0.0f,  // Back-right
+     0.1f,  0.1f,  0.1f,     0.0f, 1.0f, 0.0f,  // Front-right
+     0.1f,  0.1f,  0.1f,     0.0f, 1.0f, 0.0f,  // Front-right
+    -0.1f,  0.1f,  0.1f,     0.0f, 1.0f, 0.0f,  // Front-left
+    -0.1f,  0.1f, -0.1f,     0.0f, 1.0f, 0.0f,  // Back-left
+
+    // Bottom face (Y-)
+    -0.1f, -0.1f, -0.1f,     1.0f, 1.0f, 0.0f,  // Back-left
+     0.1f, -0.1f, -0.1f,     1.0f, 1.0f, 0.0f,  // Back-right
+     0.1f, -0.1f,  0.1f,     1.0f, 1.0f, 0.0f,  // Front-right
+     0.1f, -0.1f,  0.1f,     1.0f, 1.0f, 0.0f,  // Front-right
+    -0.1f, -0.1f,  0.1f,     1.0f, 1.0f, 0.0f,  // Front-left
+    -0.1f, -0.1f, -0.1f,     1.0f, 1.0f, 0.0f,  // Back-left
+
+    // Right face (X+)
+     0.1f, -0.1f, -0.1f,     0.0f, 0.0f, 1.0f,  // Bottom-back
+     0.1f,  0.1f, -0.1f,     0.0f, 0.0f, 1.0f,  // Top-back
+     0.1f,  0.1f,  0.1f,     0.0f, 0.0f, 1.0f,  // Top-front
+     0.1f,  0.1f,  0.1f,     0.0f, 0.0f, 1.0f,  // Top-front
+     0.1f, -0.1f,  0.1f,     0.0f, 0.0f, 1.0f,  // Bottom-front
+     0.1f, -0.1f, -0.1f,     0.0f, 0.0f, 1.0f,  // Bottom-back
+
+     // Left face (X-)
+     -0.1f, -0.1f, -0.1f,     1.0f, 1.0f, 1.0f,  // Bottom-back
+     -0.1f,  0.1f, -0.1f,     1.0f, 1.0f, 1.0f,  // Top-back
+     -0.1f,  0.1f,  0.1f,     1.0f, 1.0f, 1.0f,  // Top-front
+     -0.1f,  0.1f,  0.1f,     1.0f, 1.0f, 1.0f,  // Top-front
+     -0.1f, -0.1f,  0.1f,     1.0f, 1.0f, 1.0f,  // Bottom-front
+     -0.1f, -0.1f, -0.1f,     1.0f, 1.0f, 1.0f   // Bottom-back
+};
 
 int main(void)
 {
-
-    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++ INICIJALIZACIJA ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-    // Pokretanje GLFW biblioteke
-    // Nju koristimo za stvaranje okvira prozora / konteksta
-    if (!glfwInit()) // !0 == 1  | glfwInit inicijalizuje GLFW i vrati 1 ako je inicijalizovana uspjesno, a 0 ako nije
+    if (!glfwInit()) 
     {
         std::cout<<"GLFW Biblioteka se nije ucitala! :(\n";
         return 1;
     }
 
-    //Odredjivanje OpenGL verzije i profila (3.3, programabilni pajplajn)
-    //bez ovoga, koristi se najnoviji moguci OpenGL koji hardver podrzava
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    //Stvaranje prozora
-    GLFWwindow* window; //Mjesto u memoriji za prozor
-    unsigned int wWidth = 500;
-    unsigned int wHeight = 500;
-    const char wTitle[] = "[Generic Title]";
-    window = glfwCreateWindow(wWidth, wHeight, wTitle, NULL, NULL); // Napravi novi prozor
-    // glfwCreateWindow( sirina, visina, naslov, monitor na koji ovaj prozor ide preko citavog ekrana (u tom slucaju umjesto NULL ide glfwGetPrimaryMonitor() ), i prozori sa kojima ce dijeliti resurse )
-    if (window == NULL) //Ako prozor nije napravljen
+    GLFWwindow* window;
+    unsigned int wWidth = 800;
+    unsigned int wHeight = 800;
+    const char wTitle[] = "Rubik's Cube";
+    window = glfwCreateWindow(wWidth, wHeight, wTitle, NULL, NULL); 
+
+    if (window == NULL)
     {
         std::cout << "Prozor nije napravljen! :(\n";
-        glfwTerminate(); //Gasi GLFW
-        return 2; //Vrati kod za gresku
+        glfwTerminate(); 
+        return 2;
     }
-    // Postavljanje novopecenog prozora kao aktivni (sa kojim cemo da radimo)
+
     glfwMakeContextCurrent(window);
 
-    // Inicijalizacija GLEW biblioteke
-    if (glewInit() != GLEW_OK) //Slicno kao glfwInit. GLEW_OK je predefinisani kod za uspjesnu inicijalizaciju sadrzan unutar biblioteke
+
+    if (glewInit() != GLEW_OK) 
     {
         std::cout << "GLEW nije mogao da se ucita! :'(\n";
         return 3;
     }
 
-    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++ PROMJENLJIVE I BAFERI +++++++++++++++++++++++++++++++++++++++++++++++++
-
     unsigned int basicShader = createShader("basic.vert", "basic.frag"); // Napravi objedinjeni sejder program
 
-    float vertices[] = //Tjemena trougla koja sadrze sve informacije o njemu. Mi definisemo podatke u onom formatu koju mi zelimo
-    {
-        //Podaci su poredani za nasu citkivost - racunar ne vidi ni razmake ni redove.
-        //Moramo mu naknadno reci kako da intepretira ove podatke
+	initCube();
 
-        //Pozicija    |    Boja = RGBA (R - Crvena, G - Zelena, B - Plava, A = neprovidno; Opseg od 0 do 1, gdje je 0 crno a 1 svijetlo)
-        //X    Y       R    G    B    A
-        0.25, 0.0,    1.0, 0.0, 0.0, 1.0, //prvo tjeme, crveno
-       -0.25, 0.0,    0.0, 0.0, 1.0, 1.0, //drugo tjeme, plavo
-        0.0 ,-0.5,    1.0, 1.0, 1.0, 1.0 //trece tjeme, bijelo
-    };
-    unsigned int stride = (2 + 4) * sizeof(float); //Korak pri kretanju po podacima o tjemenima = Koliko mjesta u memoriji izmedju istih komponenti susjednih tjemena
-    //U nasem slucaju XY (2) + RGBA (4) = 6
-    //Za svrhe vjezbi ovo je efektivno velicina jednog tjemena
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
+    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
 
-    //Vertex Array Object - Sadrzi bar 16 pokazivaca na atribute koji opusuju sadrzaje bafer objekata
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO); //Generisi 1 VAO na adresi datoj adresi
-    glBindVertexArray(VAO); //Povezi VAO za aktivni kontekst - sva naknadna podesavanja ce se odnositi na taj VAO
-
-    //Vertex Buffer Object - Bafer objekat, u ovom slucaju za tjemena trougla koji crtamo
-    unsigned int VBO;
-    glGenBuffers(1, &VBO); //Generisi 1 bafer na datoj adresi 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO); //Povezi dati bafer za aktivni kontekst. Array buffer se koristi za tjemena figura.
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); //Slanje podataka na memoriju graficke karte
-    //glBufferData(koji bafer, koliko podataka ima, adresa podataka, nacin upotrebe podataka (GL_STATIC_DRAW, GL_DYNAMIC_DRAW, GL_STREAM_DRAW;)
-
-    //Opisivanje pokazivaca na atribute: Pokazivac 0 ceo opisati poziciju (koordinate x i y), a pokazivac 1 boju (komponente r, g, b i a).
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, stride, (void*)0); 
-    //glVertexAttribPointer(indeks pokazivaca, broj komponenti atributa, tip komponenti atributa, da li je potrebno normalizovati podatke (nama uvijek GL_FALSE), korak/velicina tjemena, pomjeraj sa pocetka jednog tjemena do komponente za ovaj atribut - mora biti (void*))  
-    glEnableVertexAttribArray(0); //Aktiviraj taj pokazivac i tako intepretiraj podatke
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, stride, (void*)(2 * sizeof(float))); //Objasni da su preostala cetiri broja boja (preskacemo preko XY od pozicije, pa je pomjeraj 2 * sizeof(float))
-    glEnableVertexAttribArray(1);
-
-    //Postavili smo sta treba, pa te stvari iskljucujemo, da se naknadna podesavanja ne bi odnosila na njih i nesto poremetila
-    //To radimo tako sto bindujemo 0, pa kada treba da nacrtamo nase stvari, samo ih ponovo bindujemo
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-    
-
-    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++ RENDER LOOP - PETLJA ZA CRTANJE +++++++++++++++++++++++++++++++++++++++++++++++++
+    glUseProgram(basicShader);
+    unsigned int viewLoc = glGetUniformLocation(basicShader, "view");
+    unsigned int projLoc = glGetUniformLocation(basicShader, "projection");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
     glClearColor(0.15, 0.15, 0.15, 1.0); //Podesavanje boje pozadine (RGBA format);
 
     while (!glfwWindowShouldClose(window)) //Beskonacna petlja iz koje izlazimo tek kada prozor treba da se zatvori
     {
-        //Unos od korisnika bez callback funckcije. GLFW_PRESS = Dugme je trenutno pritisnuto. GLFW_RELEASE = Dugme trenutno nije pritisnuto
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        {
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             glfwSetWindowShouldClose(window, GL_TRUE);
         }
 
-        //Brisanje ekrana
-        glClear(GL_COLOR_BUFFER_BIT);
+        handleInput(window);
+        updateRotation();
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // [KOD ZA CRTANJE]
         glUseProgram(basicShader); //Izaberi nas sejder program za crtanje i koristi ga za svo naknadno crtanje (Ukoliko ne aktiviramo neke druge sejder programe)
-        glBindVertexArray(VAO); //Izaberemo sta zelimo da crtamo
-        glDrawArrays(GL_TRIANGLES, 0, 3); //To i nacrtamo
-        //glDrawArrays(tip primitive, indeks pocetnog tjemena, koliko narednih tjemena crtamo);
-        glBindVertexArray(0);
-        glUseProgram(0);
+        drawCube(basicShader);
 
-        //Zamjena vidljivog bafera sa pozadinskim
         glfwSwapBuffers(window);
-
-        //Hvatanje dogadjaja koji se ticu okvira prozora (promjena velicine, pomjeranje itd)
         glfwPollEvents();
     }
 
-    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++ POSPREMANJE +++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-    //Brisanje bafera i sejdera
-    glDeleteBuffers(1, &VBO);
-    glDeleteVertexArrays(1, &VAO);
     glDeleteProgram(basicShader);
-    //Sve OK - batali program
     glfwTerminate();
     return 0;
+}
+
+void updateRotation() {
+    cubeState.model = glm::mat4(1.0f);
+    cubeState.model = glm::rotate(cubeState.model, glm::radians(cubeState.rotationX), glm::vec3(1.0f, 0.0f, 0.0f));
+    cubeState.model = glm::rotate(cubeState.model, glm::radians(cubeState.rotationY), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    if (cubeState.isRotating) {
+        cubeState.rotationCounter += 5.0f;
+        if (cubeState.rotationCounter >= 90.0f) {
+            cubeState.isRotating = false;
+            cubeState.rotationCounter = 0.0f;
+            updateCubeState(cubeState.currentLayer, cubeState.clockwise);
+        }
+    }
+}
+
+void updateCubeState(int face, bool clockwise) {
+    std::vector<Cubie> newCubies = cubeState.cubies;
+
+    if (face == 0) {
+        for (int i = 0; i < cubeState.cubies.size(); i++) {
+            if (std::abs(cubeState.cubies[i].position.x - 1.0f) < 0.1f) {
+                glm::vec3 oldPos = cubeState.cubies[i].position;
+                glm::vec3 newPos;
+
+                if (clockwise) {
+                    newPos.x = oldPos.x;
+                    newPos.y = -oldPos.z;
+                    newPos.z = oldPos.y;
+                }
+                else {
+                    newPos.x = oldPos.x;
+                    newPos.y = oldPos.z;
+                    newPos.z = -oldPos.y;
+                }
+
+                // Find cubie at new position
+                for (int j = 0; j < cubeState.cubies.size(); j++) {
+                    if (glm::length(cubeState.cubies[j].position - newPos) < 0.1f) {
+                        newCubies[j].colors = cubeState.cubies[i].colors;
+
+                        // Rotate colors on the face
+                        std::array<glm::vec4, 6> tempColors = newCubies[j].colors;
+                        if (clockwise) {
+							tempColors[0] = newCubies[j].colors[3];  // top becomes front
+							tempColors[1] = newCubies[j].colors[2];  // front becomes bottom
+                            tempColors[2] = newCubies[j].colors[0];  // top becomes back
+                            tempColors[3] = newCubies[j].colors[1];  // bottom becomes front
+                            tempColors[4] = newCubies[j].colors[4];  // front becomes top
+                            tempColors[5] = newCubies[j].colors[5];  // back becomes bottom
+                        }
+                        else {
+                            tempColors[0] = newCubies[j].colors[2];  // top becomes front
+                            tempColors[1] = newCubies[j].colors[3];  // front becomes bottom
+                            tempColors[2] = newCubies[j].colors[1];  // top becomes back
+                            tempColors[3] = newCubies[j].colors[0];  // bottom becomes front
+                            tempColors[4] = newCubies[j].colors[4];  // front becomes top
+                            tempColors[5] = newCubies[j].colors[5];  // back becomes bottom
+                        }
+                        newCubies[j].colors = tempColors;
+                        break;
+
+                       /* cubie.colors[0] = GREEN;
+                        cubie.colors[1] = BLUE;
+                        cubie.colors[2] = WHITE;
+                        cubie.colors[3] = YELLOW;
+                        cubie.colors[4] = RED;
+                        cubie.colors[5] = ORANGE;*/
+                    }
+                }
+            }
+        }
+    }
+
+    cubeState.cubies = newCubies;
+}
+
+void drawCube(unsigned int shaderProgram) {
+    for (const auto& cubie : cubeState.cubies) {
+        glm::mat4 model = cubeState.model;
+
+        model = glm::translate(model, cubie.position * 0.22f);
+
+        if (cubeState.isRotating) {
+            if (cubeState.currentLayer == 0 && std::abs(cubie.position.x - 1.0f) < 0.1f) {
+                model = glm::translate(model, -cubie.position * 0.22f);
+                float angle = !cubeState.clockwise ? cubeState.rotationCounter : -cubeState.rotationCounter;
+                model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));
+                model = glm::translate(model, cubie.position * 0.22f);
+            }
+        }
+        unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+        // Set color uniform
+        unsigned int colorLoc = glGetUniformLocation(shaderProgram, "cubeColor");
+
+        // Draw each face with its corresponding color
+        for (int face = 0; face < 6; face++) {
+            glUniform4fv(colorLoc, 1, glm::value_ptr(cubie.colors[face]));
+            glDrawArrays(GL_TRIANGLES, face * 6, 6);
+        }
+    }
+}
+
+void rotateFace(int face, bool clockwise) {
+    if (cubeState.isRotating)
+        return;
+
+    cubeState.isRotating = true;
+    cubeState.currentLayer = face;
+    cubeState.clockwise = clockwise;
+    cubeState.rotationCounter = 0.0f;
+}
+
+void handleInput(GLFWwindow* window) {
+    // Handle cube rotation with arrow keys
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+        cubeState.rotationX -= 1.0f;
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        cubeState.rotationX += 1.0f;
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+        cubeState.rotationY -= 1.0f;
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+        cubeState.rotationY += 1.0f;
+
+    // Handle face rotations
+    if (!cubeState.isRotating) {
+        if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+            rotateFace(0, true);  // Right face clockwise
+        if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+            rotateFace(0, false); // Right face counterclockwise
+    }
+}
+
+void initCube() {
+    cubeState.cubies.clear();
+    for (int x = -1; x <= 1; x++) {
+        for (int y = -1; y <= 1; y++) {
+            for (int z = -1; z <= 1; z++) {
+                Cubie cubie;
+                cubie.position = glm::vec3(x, y, z);
+
+                // Initialize colors for each face
+                //cubie.colors[0] = (x == 1) ? RED : glm::vec4(0.2f);     // Right
+                //cubie.colors[1] = (x == -1) ? ORANGE : glm::vec4(0.2f); // Left
+                //cubie.colors[2] = (y == 1) ? WHITE : glm::vec4(0.2f);   // Top
+                //cubie.colors[3] = (y == -1) ? YELLOW : glm::vec4(0.2f); // Bottom
+                //cubie.colors[4] = (z == 1) ? GREEN : glm::vec4(0.2f);   // Front
+                //cubie.colors[5] = (z == -1) ? BLUE : glm::vec4(0.2f);   // Back
+
+                cubie.colors[0] = GREEN;
+				cubie.colors[1] = BLUE;
+				cubie.colors[2] = WHITE;
+				cubie.colors[3] = YELLOW;
+				cubie.colors[4] = RED;
+				cubie.colors[5] = ORANGE;
+
+
+                cubeState.cubies.push_back(cubie);
+            }
+        }
+    }
+
+    unsigned int VAO, VBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubieVertices), cubieVertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 unsigned int compileShader(GLenum type, const char* source)

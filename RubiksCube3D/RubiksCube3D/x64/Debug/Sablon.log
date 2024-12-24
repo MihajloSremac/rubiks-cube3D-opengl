@@ -1,5 +1,5 @@
 ﻿  main.cpp
-D:\4.godina\RG\Projekat\Sablon\main.cpp(105,30): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
-D:\4.godina\RG\Projekat\Sablon\main.cpp(105,24): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
-D:\4.godina\RG\Projekat\Sablon\main.cpp(105,18): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
-  Sablon.vcxproj -> D:\4.godina\RG\Projekat\Sablon\x64\Debug\RubiksCube3D.exe
+D:\4.godina\RG\Projekat\24dec\rubiks-cube3d-opengl\RubiksCube3D\main.cpp(152,30): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
+D:\4.godina\RG\Projekat\24dec\rubiks-cube3d-opengl\RubiksCube3D\main.cpp(152,24): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
+D:\4.godina\RG\Projekat\24dec\rubiks-cube3d-opengl\RubiksCube3D\main.cpp(152,18): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
+  Sablon.vcxproj -> D:\4.godina\RG\Projekat\24dec\rubiks-cube3d-opengl\RubiksCube3D\x64\Debug\RubiksCube3D.exe

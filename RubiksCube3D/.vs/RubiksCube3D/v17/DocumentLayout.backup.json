@@ -1,18 +1,18 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\4.godina\\RG\\Projekat\\Sablon\\",
+  "WorkspaceRootPath": "D:\\4.godina\\RG\\Projekat\\24dec\\rubiks-cube3d-opengl\\RubiksCube3D\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{EC504904-6D9A-4E9B-8926-2B453C6C69B4}|Sablon.vcxproj|D:\\4.godina\\RG\\Projekat\\Sablon\\basic.vert||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{EC504904-6D9A-4E9B-8926-2B453C6C69B4}|Sablon.vcxproj|solutionrelative:basic.vert||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{EC504904-6D9A-4E9B-8926-2B453C6C69B4}|Sablon.vcxproj|D:\\4.godina\\RG\\Projekat\\24dec\\rubiks-cube3d-opengl\\RubiksCube3D\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{EC504904-6D9A-4E9B-8926-2B453C6C69B4}|Sablon.vcxproj|solutionrelative:main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{EC504904-6D9A-4E9B-8926-2B453C6C69B4}|Sablon.vcxproj|D:\\4.godina\\RG\\Projekat\\Sablon\\basic.frag||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "AbsoluteMoniker": "D:0:0:{EC504904-6D9A-4E9B-8926-2B453C6C69B4}|Sablon.vcxproj|D:\\4.godina\\RG\\Projekat\\24dec\\rubiks-cube3d-opengl\\RubiksCube3D\\basic.frag||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{EC504904-6D9A-4E9B-8926-2B453C6C69B4}|Sablon.vcxproj|solutionrelative:basic.frag||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{EC504904-6D9A-4E9B-8926-2B453C6C69B4}|Sablon.vcxproj|D:\\4.godina\\RG\\Projekat\\Sablon\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{EC504904-6D9A-4E9B-8926-2B453C6C69B4}|Sablon.vcxproj|solutionrelative:main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{EC504904-6D9A-4E9B-8926-2B453C6C69B4}|Sablon.vcxproj|D:\\4.godina\\RG\\Projekat\\24dec\\rubiks-cube3d-opengl\\RubiksCube3D\\basic.vert||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{EC504904-6D9A-4E9B-8926-2B453C6C69B4}|Sablon.vcxproj|solutionrelative:basic.vert||{8B382828-6202-11D1-8870-0000F87579D2}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -30,13 +30,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "basic.vert",
-              "DocumentMoniker": "D:\\4.godina\\RG\\Projekat\\Sablon\\basic.vert",
+              "DocumentMoniker": "D:\\4.godina\\RG\\Projekat\\24dec\\rubiks-cube3d-opengl\\RubiksCube3D\\basic.vert",
               "RelativeDocumentMoniker": "basic.vert",
-              "ToolTip": "D:\\4.godina\\RG\\Projekat\\Sablon\\basic.vert",
+              "ToolTip": "D:\\4.godina\\RG\\Projekat\\24dec\\rubiks-cube3d-opengl\\RubiksCube3D\\basic.vert",
               "RelativeToolTip": "basic.vert",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAASAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2024-12-22T13:25:34.393Z",
               "EditorCaption": ""
@@ -45,25 +45,27 @@
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "basic.frag",
-              "DocumentMoniker": "D:\\4.godina\\RG\\Projekat\\Sablon\\basic.frag",
+              "DocumentMoniker": "D:\\4.godina\\RG\\Projekat\\24dec\\rubiks-cube3d-opengl\\RubiksCube3D\\basic.frag",
               "RelativeDocumentMoniker": "basic.frag",
-              "ToolTip": "D:\\4.godina\\RG\\Projekat\\Sablon\\basic.frag",
+              "ToolTip": "D:\\4.godina\\RG\\Projekat\\24dec\\rubiks-cube3d-opengl\\RubiksCube3D\\basic.frag",
               "RelativeToolTip": "basic.frag",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAIAAAASAAAA",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-12-22T13:25:34.456Z"
+              "WhenOpened": "2024-12-22T13:25:34.456Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "main.cpp",
-              "DocumentMoniker": "D:\\4.godina\\RG\\Projekat\\Sablon\\main.cpp",
+              "DocumentMoniker": "D:\\4.godina\\RG\\Projekat\\24dec\\rubiks-cube3d-opengl\\RubiksCube3D\\main.cpp",
               "RelativeDocumentMoniker": "main.cpp",
-              "ToolTip": "D:\\4.godina\\RG\\Projekat\\Sablon\\main.cpp",
+              "ToolTip": "D:\\4.godina\\RG\\Projekat\\24dec\\rubiks-cube3d-opengl\\RubiksCube3D\\main.cpp",
               "RelativeToolTip": "main.cpp",
-              "ViewState": "AQIAABgAAAAAAAAAAAAAAN4AAAAAAAAA",
+              "ViewState": "AgIAAPMAAAAAAAAAAAAAAAEBAABDAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-12-22T13:25:34.458Z"
+              "WhenOpened": "2024-12-22T13:25:34.458Z",
+              "EditorCaption": ""
             }
           ]
         }
