@@ -12,6 +12,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
 #include <array>
+#include "TextRender.h"
 
 unsigned int compileShader(GLenum type, const char* source);
 unsigned int createShader(const char* vsSource, const char* fsSource);
@@ -22,6 +23,8 @@ void updateRotation();
 void drawCube(unsigned int shaderProgram);
 void handleInput(GLFWwindow* window);
 void rotateFace(int face, bool clockwise);
+
+unsigned int VAOcube, VBOcube;
 
 const glm::vec4 RED(1.0f, 0.0f, 0.0f, 1.0f);
 const glm::vec4 GREEN(0.0f, 1.0f, 0.0f, 1.0f);
@@ -113,8 +116,8 @@ int main(void)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	GLFWwindow* window;
-	unsigned int wWidth = 800;
-	unsigned int wHeight = 800;
+	unsigned int wWidth = 900;
+	unsigned int wHeight = 900;
 	const char wTitle[] = "Rubik's Cube";
 	window = glfwCreateWindow(wWidth, wHeight, wTitle, NULL, NULL);
 
@@ -127,12 +130,14 @@ int main(void)
 
 	glfwMakeContextCurrent(window);
 
-
 	if (glewInit() != GLEW_OK)
 	{
 		std::cout << "GLEW nije mogao da se ucita! :'(\n";
 		return 3;
 	}
+
+	TextRender textRender("font/consolab.ttf", "text.vert", "text.frag", 29);
+	TextRender timeTextRender("font/digital-7.ttf", "text.vert", "text.frag", 150);
 
 	unsigned int basicShader = createShader("basic.vert", "basic.frag"); // Napravi objedinjeni sejder program
 
@@ -147,7 +152,12 @@ int main(void)
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-	glClearColor(0.15, 0.15, 0.15, 1.0); //Podesavanje boje pozadine (RGBA format);
+	glClearColor(0.15, 0.15, 0.15, 1.0);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_DEPTH_TEST);
+
 
 	while (!glfwWindowShouldClose(window)) //Beskonacna petlja iz koje izlazimo tek kada prozor treba da se zatvori
 	{
@@ -158,11 +168,13 @@ int main(void)
 		handleInput(window);
 		updateRotation();
 
+		glClearColor(0.15, 0.15, 0.15, 1.0);
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// [KOD ZA CRTANJE]
-		glUseProgram(basicShader); //Izaberi nas sejder program za crtanje i koristi ga za svo naknadno crtanje (Ukoliko ne aktiviramo neke druge sejder programe)
+		glUseProgram(basicShader);
 		drawCube(basicShader);
+		textRender.RenderText("Sremac Mihajlo RA 138/2021", 30.0f, 30.0f, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -475,6 +487,9 @@ void updateCubeState(int face, bool clockwise) {
 }
 
 void drawCube(unsigned int shaderProgram) {
+	
+	glBindVertexArray(VAOcube);
+
 	for (const auto& cubie : cubeState.cubies) {
 		glm::mat4 model = cubeState.model;
 
@@ -534,7 +549,9 @@ void drawCube(unsigned int shaderProgram) {
 			glUniform4fv(colorLoc, 1, glm::value_ptr(cubie.colors[face]));
 			glDrawArrays(GL_TRIANGLES, face * 6, 6);
 		}
+
 	}
+		glUseProgram(0);
 }
 
 void rotateFace(int face, bool clockwise) {
@@ -608,12 +625,11 @@ void initCube() {
 		}
 	}
 
-	unsigned int VAO, VBO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
+	glGenVertexArrays(1, &VAOcube);
+	glGenBuffers(1, &VBOcube);
 
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindVertexArray(VAOcube);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOcube);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cubieVertices), cubieVertices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
