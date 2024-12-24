@@ -637,6 +637,8 @@ void importantCallbacks(GLFWwindow* window, int key, int scancode, int action, i
 	timer.KeyCallback(key, action);
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+		if (cubeState.isRotating || !scrambleQueue.empty())
+			return;
 		scramble = generateScramble();
 	}
 	if (key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS) {
@@ -693,11 +695,20 @@ string generateScramble() {
 	string move;
 	for (int i = 0; i < scramble.size(); ++i) {
 		if (scramble[i] == ' ') {
-			scrambleQueue.push(move); // Add the move to the queue
+			// Handle the case where the move has a "2" (double move, e.g., B2, R2)
+			if (move.size() > 1 && move[move.size() - 1] == '2') {
+				// Remove the "2" and push the move twice
+				move.pop_back();  // Remove the '2'
+				scrambleQueue.push(move); // Push the move once
+				scrambleQueue.push(move); // Push the move again
+			}
+			else {
+				scrambleQueue.push(move); // Push the regular move
+			}
 			move.clear();
 		}
 		else {
-			move += scramble[i];
+			move += scramble[i]; // Add the character to the move
 		}
 	}
 

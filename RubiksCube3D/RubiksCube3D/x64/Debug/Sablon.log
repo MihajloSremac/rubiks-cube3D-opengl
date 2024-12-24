@@ -1,5 +1,5 @@
 ﻿  main.cpp
-D:\4.godina\RG\Projekat\24dec\rubiks-cube3d-opengl\RubiksCube3D\main.cpp(679,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+D:\4.godina\RG\Projekat\24dec\rubiks-cube3d-opengl\RubiksCube3D\main.cpp(681,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
 freetype26d.lib(ftinit.obj) : warning LNK4099: PDB '' was not found with 'freetype26d.lib(ftinit.obj)' or at ''; linking object as if no debug info
 freetype26d.lib(ftbase.obj) : warning LNK4099: PDB '' was not found with 'freetype26d.lib(ftbase.obj)' or at ''; linking object as if no debug info
 freetype26d.lib(autofit.obj) : warning LNK4099: PDB '' was not found with 'freetype26d.lib(autofit.obj)' or at ''; linking object as if no debug info
