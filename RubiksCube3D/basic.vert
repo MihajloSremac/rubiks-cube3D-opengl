@@ -1,12 +1,9 @@
-#version 330 core //Koju verziju GLSL jezika da koristim (za programabilni pipeline: GL verzija * 100) i koji profil (core - samo programabilni pipeline, compatibility - core + zastarjele stvari)
-
-//Kanali (in, out)
-layout(location = 0) in vec2 inPos; //Pozicija tjemena
-layout(location = 1) in vec4 inCol; //Boja tjemena - ovo saljemo u fragment sejder
-out vec4 chCol; //Izlazni kanal kroz koji saljemo boju do fragment sejdera
-
-void main() //Glavna funkcija sejdera
-{
-	gl_Position = vec4(inPos.xy, 0.0, 1.0); //gl_Position je predefinisana promjenljiva za pozicije u koju stavljamo nase koordinate. Definisana je kao vec4 pa zbog toga konvertujemo
-	chCol = inCol;
-}
+#version 330 core
+        layout (location = 0) in vec3 aPos;
+        uniform mat4 model;
+        uniform mat4 view;
+        uniform mat4 projection;
+        
+        void main() {
+            gl_Position = projection * view * model * vec4(aPos, 1.0);
+        }
