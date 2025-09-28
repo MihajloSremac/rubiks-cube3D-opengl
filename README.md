@@ -14,5 +14,7 @@ Back Side: B, N
 Other Commands:
 
 Shift – New Scramble
+
 Backspace – Force Solve
+
 Spacebar – Start/Stop Timer
